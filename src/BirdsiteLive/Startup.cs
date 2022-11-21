@@ -1,39 +1,26 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 using BirdsiteLive.Common.Settings;
 using BirdsiteLive.Common.Structs;
 using BirdsiteLive.DAL.Contracts;
 using BirdsiteLive.DAL.Postgres.DataAccessLayers;
 using BirdsiteLive.DAL.Postgres.Settings;
-using BirdsiteLive.Models;
+using BirdsiteLive.Services;
 using BirdsiteLive.Twitter;
 using BirdsiteLive.Twitter.Tools;
 using Lamar;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 
 namespace BirdsiteLive
 {
     public class Startup
     {
-        public Startup(IWebHostEnvironment env)
+        public Startup(IConfiguration configuration)
         {
-            Console.WriteLine($"EnvironmentName {env.EnvironmentName}");
-
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName.ToLowerInvariant()}.json", optional: true)
-                .AddEnvironmentVariables();
-            if (env.IsDevelopment()) builder.AddUserSecrets<Startup>();
-            Configuration = builder.Build();
+            Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
@@ -42,14 +29,14 @@ namespace BirdsiteLive
         public void ConfigureServices(IServiceCollection services)
         {
             var logsSettings = Configuration.GetSection("Logging").Get<LogsSettings>();
-            if(string.Equals("insights", logsSettings.Type, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals("insights", logsSettings.Type, StringComparison.OrdinalIgnoreCase))
             {
                 var key = logsSettings.InstrumentationKey;
                 services.AddApplicationInsightsTelemetry(key);
             }
 
             services.AddControllersWithViews();
-
+            services.AddHostedService<FederationService>();
             services.AddHttpClient();
         }
 
@@ -78,7 +65,7 @@ namespace BirdsiteLive
                     ConnString = connString
                 };
                 services.For<PostgresSettings>().Use(x => postgresSettings);
-                
+
                 services.For<ITwitterUserDal>().Use<TwitterUserPostgresDal>().Singleton();
                 services.For<IFollowersDal>().Use<FollowersPostgresDal>().Singleton();
                 services.For<IDbInitializerDal>().Use<DbInitializerPostgresDal>().Singleton();
@@ -87,7 +74,7 @@ namespace BirdsiteLive
             {
                 throw new NotImplementedException($"{dbSettings.Type} is not supported");
             }
-            
+
             services.For<ITwitterUserService>().DecorateAllWith<CachedTwitterUserService>();
             services.For<ITwitterUserService>().Use<TwitterUserService>().Singleton();
 
@@ -108,7 +95,7 @@ namespace BirdsiteLive
 
                 //_.AssemblyContainingType<IDal>();
                 //_.Exclude(type => type.Name.Contains("Settings"));
-                
+
                 _.WithDefaultConventions();
 
                 _.LookForRegistries();
@@ -118,6 +105,7 @@ namespace BirdsiteLive
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            Console.WriteLine($"EnvironmentName {env.EnvironmentName}");
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -132,16 +120,7 @@ namespace BirdsiteLive
             //app.UseHttpsRedirection();
             app.UseStaticFiles();
 
-            app.UseRouting();
-
             app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
-            });
         }
     }
 }
