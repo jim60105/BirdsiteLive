@@ -40,7 +40,12 @@
     else
     {
         <div>
-            <p>Search this handle to find it in your instance:</p>
+            <form action="/users/@ViewData.Model.Acct/remote_follow" method="post">
+                <input type="text" class="form-control mb-2" placeholder="your handle, i.e. @@lain@@pleroma.com" name="webfinger" />
+                <input type="submit" class="btn btn-primary w-100 mb-2" value="Remote follow" />
+            </form>
+
+            <p>or search this handle to find it in your instance:</p>
 
             <input type="text" name="textbox" value="@ViewData.Model.InstanceHandle" onclick="this.select()" class="form-control" readonly />
         </div>

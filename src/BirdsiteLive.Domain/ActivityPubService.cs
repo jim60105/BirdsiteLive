@@ -20,6 +20,7 @@ namespace BirdsiteLive.Domain
         Task<HttpStatusCode> PostDataAsync<T>(T data, string targetHost, string actorUrl, string inbox = null);
         Task PostNewNoteActivity(Note note, string username, string noteId, string targetHost,
             string targetInbox);
+        Task<WebFingerData> WebFinger(string account);
     }
 
     public class ActivityPubService : IActivityPubService
@@ -122,6 +123,15 @@ namespace BirdsiteLive.Domain
             var response = await client.SendAsync(httpRequestMessage);
             response.EnsureSuccessStatusCode();
             return response.StatusCode;
+        }
+
+        public async Task<WebFingerData> WebFinger(string account)
+        {
+            var httpClient = _httpClientFactory.CreateClient();
+            var result = await httpClient.GetAsync("https://" + account.Split('@')[1] + "/.well-known/webfinger?resource=acct:" + account);
+            var content = await result.Content.ReadAsStringAsync();
+
+            return JsonConvert.DeserializeObject<WebFingerData>(content);
         }
     }
 }

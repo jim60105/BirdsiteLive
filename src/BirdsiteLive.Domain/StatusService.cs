@@ -52,8 +52,8 @@ namespace BirdsiteLive.Domain
             
             string summary = null;
             var sensitive = _publicationRepository.IsSensitive(username);
-            if (sensitive)
-                summary = "Potential Content Warning";
+            if (sensitive || tweet.IsSensitive)
+                summary = "Sensitive Content";
 
             var extractedTags = _statusExtractor.Extract(tweet.MessageContent);
             _statisticsHandler.ExtractedStatus(extractedTags.tags.Count(x => x.type == "Mention"));
@@ -73,6 +73,9 @@ namespace BirdsiteLive.Domain
             if (tweet.InReplyToStatusId != default)
                 inReplyTo = $"https://{_instanceSettings.Domain}/users/{tweet.InReplyToAccount.ToLowerInvariant()}/statuses/{tweet.InReplyToStatusId}";
 
+            if( tweet.QuoteTweetUrl != null )
+                content += $@"<span class=""quote-inline""><br><br>RT: <a href=""{tweet.QuoteTweetUrl}"">{tweet.QuoteTweetUrl}</a></span>";
+
             var note = new Note
             {
                 id = noteUrl,
@@ -86,11 +89,13 @@ namespace BirdsiteLive.Domain
                 to = new[] { to },
                 cc = cc,
 
-                sensitive = sensitive,
+                sensitive = tweet.IsSensitive || sensitive,
                 summary = summary,
                 content = $"<p>{content}</p>",
                 attachment = Convert(tweet.Media),
-                tag = extractedTags.tags
+                tag = extractedTags.tags,
+
+                quoteUrl = tweet.QuoteTweetUrl
             };
 
             return note;

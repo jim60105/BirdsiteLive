@@ -14,6 +14,8 @@ namespace BirdsiteLive
 {
     public class Program
     {
+        public static string VERSION = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString(3) + "+pasture";
+
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();

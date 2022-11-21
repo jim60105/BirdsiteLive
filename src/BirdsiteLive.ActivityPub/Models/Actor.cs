@@ -1,5 +1,8 @@
-﻿using System.Net;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
 using BirdsiteLive.ActivityPub.Converters;
+using BirdsiteLive.ActivityPub.Models;
 using Newtonsoft.Json;
 
 namespace BirdsiteLive.ActivityPub
@@ -9,7 +12,7 @@ namespace BirdsiteLive.ActivityPub
         //[JsonPropertyName("@context")]
         [JsonProperty("@context")]
         [JsonConverter(typeof(ContextArrayConverter))]
-        public string[] context { get; set; } = new[] { "https://www.w3.org/ns/activitystreams", "https://w3id.org/security/v1" };
+        public object[] context { get; set; } = Activity.DefaultContext;
         public string id { get; set; }
         public string type { get; set; }
         public string followers { get; set; }
@@ -25,5 +28,6 @@ namespace BirdsiteLive.ActivityPub
         public Image image { get; set; }
         public EndPoints endpoints { get; set; }
         public UserAttachment[] attachment { get; set; }
+        public List<Tag> tag;
     }
 }

@@ -10,49 +10,21 @@ namespace BirdsiteLive.Controllers
 {
     public class AboutController : Controller
     {
-        private readonly IModerationRepository _moderationRepository;
-        private readonly ICachedStatisticsService _cachedStatisticsService;
+        private readonly IAboutPageService _aboutPageService;
 
         #region Ctor
-        public AboutController(IModerationRepository moderationRepository, ICachedStatisticsService cachedStatisticsService)
+        public AboutController(IAboutPageService cachedStatisticsService)
         {
-            _moderationRepository = moderationRepository;
-            _cachedStatisticsService = cachedStatisticsService;
+            _aboutPageService = cachedStatisticsService;
         }
         #endregion
 
         public async Task<IActionResult> Index()
         {
-            var stats = await _cachedStatisticsService.GetStatisticsAsync();
+            var stats = await _aboutPageService.GetAboutPageDataAsync();
             return View(stats);
         }
-
-        public IActionResult Blacklisting()
-        {
-            var status = GetModerationStatus();
-            return View("Blacklisting", status);
-        }
-
-        public IActionResult Whitelisting()
-        {
-            var status = GetModerationStatus();
-            return View("Whitelisting", status);
-        }
-
-        private ModerationStatus GetModerationStatus()
-        {
-            var status = new ModerationStatus
-            {
-                Followers = _moderationRepository.GetModerationType(ModerationEntityTypeEnum.Follower),
-                TwitterAccounts = _moderationRepository.GetModerationType(ModerationEntityTypeEnum.TwitterAccount)
-            };
-            return status;
-        }
     }
 
-    public class ModerationStatus
-    {
-        public ModerationTypeEnum Followers { get; set; }
-        public ModerationTypeEnum TwitterAccounts { get; set; }
-    }
+
 }

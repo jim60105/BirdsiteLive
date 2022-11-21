@@ -91,6 +91,9 @@ namespace BirdsiteLive
             services.For<ITwitterUserService>().DecorateAllWith<CachedTwitterUserService>();
             services.For<ITwitterUserService>().Use<TwitterUserService>().Singleton();
 
+            services.For<ITwitterTweetsService>().DecorateAllWith<CachedTwitterTweetsService>();
+            services.For<ITwitterTweetsService>().Use<TwitterTweetsService>().Singleton();
+
             services.For<ITwitterAuthenticationInitializer>().Use<TwitterAuthenticationInitializer>().Singleton();
 
             services.Scan(_ =>
@@ -118,6 +121,7 @@ namespace BirdsiteLive
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseBrowserLink();
             }
             else
             {

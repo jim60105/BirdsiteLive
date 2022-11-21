@@ -62,7 +62,6 @@ namespace BirdsiteLive.Controllers
         [Route("/nodeinfo/{id}.json")]
         public async Task<IActionResult> NodeInfo(string id)
         {
-            var version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString(3);
             var twitterUsersCount = await _twitterUserDal.GetTwitterUsersCountAsync();
             var isOpenRegistration = _moderationRepository.GetModerationType(ModerationEntityTypeEnum.Follower) != ModerationTypeEnum.WhiteListing;
 
@@ -82,7 +81,7 @@ namespace BirdsiteLive.Controllers
                     software = new Software()
                     {
                         name = "birdsitelive",
-                        version = version
+                        version = Program.VERSION
                     },
                     protocols = new[]
                     {
@@ -117,7 +116,7 @@ namespace BirdsiteLive.Controllers
                     software = new SoftwareV21()
                     {
                         name = "birdsitelive",
-                        version = version,
+                        version = Program.VERSION,
                         repository = "https://github.com/NicolasConstant/BirdsiteLive"
                     },
                     protocols = new[]

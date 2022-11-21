@@ -13,10 +13,10 @@ Your instance will need [docker](https://docs.docker.com/engine/install/) and [d
 
 ## Setup
 
-Download the [docker-compose file](https://github.com/NicolasConstant/BirdsiteLive/blob/master/docker-compose.yml): 
+Download the [docker-compose file](https://git.gamers.exposed/pasture/BirdsiteLIVE/raw/branch/master/docker-compose.yml): 
 
 ```
-sudo curl -L https://raw.githubusercontent.com/NicolasConstant/BirdsiteLive/master/docker-compose.yml -o docker-compose.yml
+sudo curl -L https://git.gamers.exposed/pasture/BirdsiteLIVE/raw/branch/master/docker-compose.yml -o docker-compose.yml
 ```
 
 Then edit file: 
@@ -168,11 +168,11 @@ networks:
 
 services:
     server:
-        image: nicolasconstant/birdsitelive:latest
+        image: pasture/birdsitelive:latest
         [...]
 
     db:
-        image: postgres:9.6
+        image: postgres:13
         [...]
         
 +   watchtower:

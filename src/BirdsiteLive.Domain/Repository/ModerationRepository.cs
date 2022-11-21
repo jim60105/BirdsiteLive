@@ -11,6 +11,12 @@ namespace BirdsiteLive.Domain.Repository
     {
         ModerationTypeEnum GetModerationType(ModerationEntityTypeEnum type);
         ModeratedTypeEnum CheckStatus(ModerationEntityTypeEnum type, string entity);
+
+        IEnumerable<string> GetWhitelistedFollowers();
+        IEnumerable<string> GetBlacklistedFollowers();
+        IEnumerable<string> GetWhitelistedAccounts();
+
+        IEnumerable<string> GetBlacklistedAccounts();
     }
 
     public class ModerationRepository : IModerationRepository
@@ -23,9 +29,13 @@ namespace BirdsiteLive.Domain.Repository
         private readonly Dictionary<ModerationEntityTypeEnum, ModerationTypeEnum> _modMode =
             new Dictionary<ModerationEntityTypeEnum, ModerationTypeEnum>();
 
+        private readonly ModerationSettings _settings;
+
         #region Ctor
         public ModerationRepository(ModerationSettings settings)
         {
+            _settings = settings;
+
             var parsedFollowersWhiteListing = PatternsParser.Parse(settings.FollowersWhiteListing);
             var parsedFollowersBlackListing = PatternsParser.Parse(settings.FollowersBlackListing);
             var parsedTwitterAccountsWhiteListing = PatternsParser.Parse(settings.TwitterAccountsWhiteListing);
@@ -122,6 +132,35 @@ namespace BirdsiteLive.Domain.Repository
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        private char GetSplitChar(string entry)
+        {
+            var separationChar = '|';
+            if (entry.Contains(";")) separationChar = ';';
+            else if (entry.Contains(",")) separationChar = ',';
+
+            return separationChar;
+        }
+
+        public IEnumerable<string> GetWhitelistedFollowers()
+        {
+            return _settings.FollowersWhiteListing.Split(GetSplitChar(_settings.FollowersWhiteListing));
+        }
+
+        public IEnumerable<string> GetBlacklistedFollowers()
+        {
+            return _settings.FollowersBlackListing.Split(GetSplitChar(_settings.FollowersBlackListing));
+        }
+
+        public IEnumerable<string> GetWhitelistedAccounts()
+        {
+            return _settings.TwitterAccountsWhiteListing.Split(GetSplitChar(_settings.TwitterAccountsWhiteListing));
+        }
+
+        public IEnumerable<string> GetBlacklistedAccounts()
+        {
+            return _settings.TwitterAccountsBlackListing.Split(GetSplitChar(_settings.TwitterAccountsBlackListing));
         }
     }
 

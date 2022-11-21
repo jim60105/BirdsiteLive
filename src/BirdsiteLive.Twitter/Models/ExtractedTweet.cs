@@ -15,5 +15,7 @@ namespace BirdsiteLive.Twitter.Models
         public bool IsThread { get; set; }
         public bool IsRetweet { get; set; }
         public string RetweetUrl { get; set; }
+        public bool IsSensitive { get; set; }
+        public string QuoteTweetUrl { get; set; }
     }
 }

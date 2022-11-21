@@ -6,21 +6,24 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using BirdsiteLive.Models;
+using BirdsiteLive.Common.Settings;
 
 namespace BirdsiteLive.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly InstanceSettings _instanceSettings;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, InstanceSettings instanceSettings)
         {
             _logger = logger;
+            _instanceSettings = instanceSettings;
         }
 
         public IActionResult Index()
         {
-            return View();
+            return View(_instanceSettings);
         }
 
         public IActionResult Privacy()

@@ -14,10 +14,10 @@ namespace BirdsiteLive.Component
     public class NodeInfoViewComponent : ViewComponent
     {
         private readonly IModerationRepository _moderationRepository;
-        private readonly ICachedStatisticsService _cachedStatisticsService;
+        private readonly IAboutPageService _cachedStatisticsService;
         
         #region Ctor
-        public NodeInfoViewComponent(IModerationRepository moderationRepository, ICachedStatisticsService cachedStatisticsService)
+        public NodeInfoViewComponent(IModerationRepository moderationRepository, IAboutPageService cachedStatisticsService)
         {
             _moderationRepository = moderationRepository;
             _cachedStatisticsService = cachedStatisticsService;
@@ -29,7 +29,7 @@ namespace BirdsiteLive.Component
             var followerPolicy = _moderationRepository.GetModerationType(ModerationEntityTypeEnum.Follower);
             var twitterAccountPolicy = _moderationRepository.GetModerationType(ModerationEntityTypeEnum.TwitterAccount);
 
-            var statistics = await _cachedStatisticsService.GetStatisticsAsync();
+            var statistics = await _cachedStatisticsService.GetAboutPageDataAsync();
 
             var viewModel = new NodeInfoViewModel
             {
@@ -37,7 +37,8 @@ namespace BirdsiteLive.Component
                                       twitterAccountPolicy == ModerationTypeEnum.BlackListing,
                 WhitelistingEnabled = followerPolicy == ModerationTypeEnum.WhiteListing ||
                                       twitterAccountPolicy == ModerationTypeEnum.WhiteListing,
-                InstanceSaturation = statistics.Saturation
+                InstanceSaturation = statistics.Saturation,
+                DiscloseRestrictions = statistics.Settings.DiscloseInstanceRestrictions
             };
             
             //viewModel = new NodeInfoViewModel
@@ -55,5 +56,6 @@ namespace BirdsiteLive.Component
         public bool BlacklistingEnabled { get; set; }
         public bool WhitelistingEnabled { get; set; }
         public int InstanceSaturation { get; set; }
+        public bool DiscloseRestrictions { get; set; }
     }
 }

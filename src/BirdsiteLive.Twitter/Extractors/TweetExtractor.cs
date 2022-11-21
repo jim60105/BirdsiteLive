@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using BirdsiteLive.Common.Settings;
 using BirdsiteLive.Twitter.Models;
 using Tweetinvi.Models;
 using Tweetinvi.Models.Entities;
@@ -15,6 +16,15 @@ namespace BirdsiteLive.Twitter.Extractors
 
     public class TweetExtractor : ITweetExtractor
     {
+        private readonly InstanceSettings _instanceSettings;
+
+        #region Ctor
+        public TweetExtractor(InstanceSettings instanceSettings)
+        {
+            this._instanceSettings = instanceSettings;
+        }
+        #endregion
+
         public ExtractedTweet Extract(ITweet tweet)
         {
             var extractedTweet = new ExtractedTweet
@@ -28,7 +38,9 @@ namespace BirdsiteLive.Twitter.Extractors
                 IsReply = tweet.InReplyToUserId != null,
                 IsThread = tweet.InReplyToUserId != null && tweet.InReplyToUserId == tweet.CreatedBy.Id,
                 IsRetweet = tweet.IsRetweet || tweet.QuotedStatusId != null,
-                RetweetUrl = ExtractRetweetUrl(tweet)
+                RetweetUrl = ExtractRetweetUrl(tweet),
+                IsSensitive = tweet.PossiblySensitive,
+                QuoteTweetUrl = tweet.QuotedStatusId != null ? "https://" + _instanceSettings.Domain + "/users/" + tweet.QuotedTweet.CreatedBy.ScreenName + "/statuses/" + tweet.QuotedStatusId : null
             };
 
             return extractedTweet;
@@ -40,7 +52,10 @@ namespace BirdsiteLive.Twitter.Extractors
             {
                 if (tweet.RetweetedTweet != null)
                 {
-                    return tweet.RetweetedTweet.Url;
+                    var uri = new UriBuilder(tweet.RetweetedTweet.Url);
+                    uri.Host = _instanceSettings.TwitterDomain;
+
+                    return uri.Uri.ToString();
                 }
                 if (tweet.FullText.Contains("https://t.co/"))
                 {
@@ -71,7 +86,11 @@ namespace BirdsiteLive.Twitter.Extractors
                     message = message.Replace(tweetUrl, string.Empty).Trim();
             }
 
-            if (tweet.QuotedTweet != null) message = $"[Quote {{RT}}]{Environment.NewLine}{message}";
+            if (tweet.QuotedTweet != null && ! _instanceSettings.EnableQuoteRT)
+            {
+                message = $"[Quote {{RT}}]{Environment.NewLine}{message}";
+            }
+
             if (tweet.IsRetweet)
             {
                 if (tweet.RetweetedTweet != null && !message.StartsWith("RT"))
@@ -84,7 +103,26 @@ namespace BirdsiteLive.Twitter.Extractors
 
             // Expand URLs
             foreach (var url in tweet.Urls.OrderByDescending(x => x.URL.Length))
+            {
+                // A bit of a hack
+                if (url.ExpandedURL == tweet.QuotedTweet?.Url && _instanceSettings.EnableQuoteRT)
+                {
+                    url.ExpandedURL = "";
+                } else
+                {
+                    var linkUri = new UriBuilder(url.ExpandedURL);
+
+                    if (linkUri.Host == "twitter.com")
+                    {
+                        linkUri.Host = _instanceSettings.TwitterDomain;
+                        url.ExpandedURL = linkUri.Uri.ToString();
+                    }
+                }
+
                 message = message.Replace(url.URL, url.ExpandedURL);
+            }
+
+            // Hack
 
             return message;
         }
@@ -101,6 +139,7 @@ namespace BirdsiteLive.Twitter.Extractors
                 var mediaUrl = GetMediaUrl(m);
                 var mediaType = GetMediaType(m.MediaType, mediaUrl);
                 if (mediaType == null) continue;
+
 
                 var att = new ExtractedMedia
                 {

@@ -11,6 +11,7 @@ using BirdsiteLive.ActivityPub.Models;
 using BirdsiteLive.Common.Regexes;
 using BirdsiteLive.Common.Settings;
 using BirdsiteLive.Cryptography;
+using BirdsiteLive.DAL.Contracts;
 using BirdsiteLive.Domain.BusinessUseCases;
 using BirdsiteLive.Domain.Repository;
 using BirdsiteLive.Domain.Statistics;
@@ -48,8 +49,10 @@ namespace BirdsiteLive.Domain
 
         private readonly IModerationRepository _moderationRepository;
 
+        private readonly IFollowersDal _followerDal;
+
         #region Ctor
-        public UserService(InstanceSettings instanceSettings, ICryptoService cryptoService, IActivityPubService activityPubService, IProcessFollowUser processFollowUser, IProcessUndoFollowUser processUndoFollowUser, IStatusExtractor statusExtractor, IExtractionStatisticsHandler statisticsHandler, ITwitterUserService twitterUserService, IModerationRepository moderationRepository, IProcessDeleteUser processDeleteUser)
+        public UserService(InstanceSettings instanceSettings, ICryptoService cryptoService, IActivityPubService activityPubService, IProcessFollowUser processFollowUser, IProcessUndoFollowUser processUndoFollowUser, IStatusExtractor statusExtractor, IExtractionStatisticsHandler statisticsHandler, ITwitterUserService twitterUserService, IModerationRepository moderationRepository, IProcessDeleteUser processDeleteUser, IFollowersDal followerDal)
         {
             _instanceSettings = instanceSettings;
             _cryptoService = cryptoService;
@@ -61,6 +64,7 @@ namespace BirdsiteLive.Domain
             _twitterUserService = twitterUserService;
             _moderationRepository = moderationRepository;
             _processDeleteUser = processDeleteUser;
+            _followerDal = followerDal;
         }
         #endregion
 
@@ -77,6 +81,34 @@ namespace BirdsiteLive.Domain
                 description = extracted.content;
 
                 _statisticsHandler.ExtractedDescription(extracted.tags.Count(x => x.type == "Mention"));
+            }
+
+            var attachments = new List<UserAttachment>();
+            attachments.Add(new UserAttachment
+            {
+                type = "PropertyValue",
+                name = _instanceSettings.TwitterDomainLabel != "" ? _instanceSettings.TwitterDomainLabel : _instanceSettings.TwitterDomain,
+                value = $"<a href=\"https://{_instanceSettings.TwitterDomain}/{acct}\" rel=\"me nofollow noopener noreferrer\" target=\"_blank\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">{_instanceSettings.TwitterDomain}/{acct}</span></a>"
+            });
+
+            if(_instanceSettings.TwitterDomain != "twitter.com")
+            {
+                attachments.Add(new UserAttachment
+                {
+                    type = "PropertyValue",
+                    name = "Twitter",
+                    value = $"twitter.com/{acct}"
+                });
+            }
+
+            if (_instanceSettings.ShowAboutInstanceOnProfiles)
+            {
+                attachments.Add(new UserAttachment
+                {
+                    type = "PropertyValue",
+                    name = $"About {_instanceSettings.Name}",
+                    value = $"<a href=\"https://{_instanceSettings.Domain}/About\" rel=\"nofollow noopener noreferrer\" target=\"_blank\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">{_instanceSettings.Domain}/About</span></a>"
+                });
             }
 
             var user = new Actor
@@ -106,20 +138,33 @@ namespace BirdsiteLive.Domain
                     mediaType = "image/jpeg",
                     url = twitterUser.ProfileBannerURL
                 },
-                attachment = new []
-                {
-                    new UserAttachment
-                    {
-                        type = "PropertyValue",
-                        name = "Official",
-                        value = $"<a href=\"https://twitter.com/{acct}\" rel=\"me nofollow noopener noreferrer\" target=\"_blank\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">twitter.com/{acct}</span></a>"
-                    }
-                },
+                attachment = attachments.ToArray(),
                 endpoints = new EndPoints
                 {
                     sharedInbox = $"https://{_instanceSettings.Domain}/inbox"
                 }
             };
+
+            if (twitterUser.Verified)
+            {
+                user.tag = new List<Tag>
+                {
+                    new Tag
+                    {
+                        icon = new TagResource
+                        {
+                            type = "Image",
+                            url = "https://" + _instanceSettings.Domain + "/verified.png"
+                        },
+                        id = "https://" + _instanceSettings.Domain + "/verified.png",
+                        name = ":verified:",
+                        type = "Emoji"
+                    }
+                };
+
+                user.name += " :verified:";
+            }
+
             return user;
         }
 
@@ -159,6 +204,16 @@ namespace BirdsiteLive.Domain
                 if (twitterAccountModPolicy == ModerationTypeEnum.WhiteListing && twitterUserStatus != ModeratedTypeEnum.WhiteListed ||
                     twitterAccountModPolicy == ModerationTypeEnum.BlackListing && twitterUserStatus == ModeratedTypeEnum.BlackListed)
                     return await SendRejectFollowAsync(activity, followerHost);
+            }
+
+            // Validate follower count < MaxFollowsPerUser
+            if (_instanceSettings.MaxFollowsPerUser > 0) {
+                var follower = await _followerDal.GetFollowerAsync(followerUserName, followerHost);
+
+                if (follower != null && follower.Followings.Count + 1 > _instanceSettings.MaxFollowsPerUser)
+                {
+                    return await SendRejectFollowAsync(activity, followerHost);
+                }
             }
 
             // Validate User Protected

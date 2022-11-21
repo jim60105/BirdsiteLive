@@ -11,5 +11,7 @@
         public string Acct { get; set; }
         public string ProfileBannerURL { get; set; }
         public bool Protected { get; set; }
+        public bool Sensitive { get; set; }
+        public bool Verified { get; set; }
     }
 }

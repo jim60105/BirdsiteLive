@@ -10,9 +10,27 @@
         public int MaxUsersCapacity { get; set; }
 
         public string UnlistedTwitterAccounts { get; set; }
+
+        public string TwitterDomain { get; set; }
+
+        public string InfoBanner { get; set; }
+
+        public string TwitterDomainLabel { get; set; }
+
+        public bool ShowAboutInstanceOnProfiles { get; set; }
+
+        public int MaxFollowsPerUser { get; set; }
+
+        public bool DiscloseInstanceRestrictions { get; set; }
+
         public string SensitiveTwitterAccounts { get; set; }
 
         public int FailingTwitterUserCleanUpThreshold { get; set; }
+
+        public int MaxStatusFetchAge { get; set; }
+
+        public bool EnableQuoteRT { get; set; }
+        
         public int FailingFollowerCleanUpThreshold { get; set; } = -1;
 
         public int UserCacheCapacity { get; set; }

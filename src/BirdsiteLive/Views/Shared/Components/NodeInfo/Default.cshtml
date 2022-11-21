@@ -1,17 +1,13 @@
 ﻿@model BirdsiteLive.Component.NodeInfoViewModel
 
 <div>
-    @if (ViewData.Model.WhitelistingEnabled)
+    @if (ViewData.Model.DiscloseRestrictions && (ViewData.Model.WhitelistingEnabled || ViewData.Model.BlacklistingEnabled))
     {
-        <a asp-controller="About" asp-action="Whitelisting" class="badge badge-light" title="What does this mean?">Whitelisting Enabled</a>
-    }
-    @if (ViewData.Model.BlacklistingEnabled)
-    {
-        <a asp-controller="About" asp-action="Blacklisting" class="badge badge-light" title="What does this mean?">Blacklisting Enabled</a>
+        <a asp-controller="About" asp-action="Index" class="badge badge-light" title="What does this mean?" asp-fragment="restrictions">View restrictions</a>
     }
 
     <div class="node-progress-bar">
-        <div class="node-progress-bar__label"><a asp-controller="About" asp-action="Index">Instance saturation:</a></div>
+        <div class="node-progress-bar__label"><a asp-controller="About" asp-action="Index" asp-fragment="saturation">Instance saturation:</a></div>
         <div class="progress node-progress-bar__bar">
             <div class="progress-bar 
                  @((ViewData.Model.InstanceSaturation > 50 && ViewData.Model.InstanceSaturation < 75) ? "bg-warning ":"")
