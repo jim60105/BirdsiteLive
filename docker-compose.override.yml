@@ -1,0 +1,26 @@
+version: "3.4"
+
+networks:
+    proxy-tier:
+        external: true
+        name: proxy-tier
+
+services:
+    server:
+        environment:
+            - LETSENCRYPT_TEST=false
+            - LETSENCRYPT_EMAIL=jim60105@gmail.com
+            - LETSENCRYPT_HOST=twitterbridge.mastodon.maki0419.com
+            - VIRTUAL_HOST=twitterbridge.mastodon.maki0419.com
+
+            - Instance__Name=BirdsiteLIVE.maki0419
+            - Instance__Domain=twitterbridge.mastodon.maki0419.com
+            - Instance__AdminEmail=jim60105@gmail.com
+            - Instance__InfoBanner=This is a personal instance of BirdsiteLIVE.<br>You cannot add users.<br>Check <a href="/About">the about page</a> to run your own instance.
+            - Instance__TwitterDomain=nitter.net
+            - Instance__TwitterDomainLabel=Nitter
+            - Instance__MaxStatusFetchAge=3
+
+            - Moderation__TwitterAccountsWhiteListing=quon01tama,Qtama_staff,IROA_kuma,sudayoruka,MinaiAlma,matorikakeru,t3c_o0o
+        networks:
+            - proxy-tier
