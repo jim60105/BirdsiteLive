@@ -22,5 +22,13 @@ services:
             - Instance__MaxStatusFetchAge=3
 
             - Moderation__TwitterAccountsWhiteListing=quon01tama,Qtama_staff,IROA_kuma,sudayoruka,MinaiAlma,matorikakeru,t3c_o0o
+
+            - Logging__LogLevel__Default=Debug
+            - Logging__LogLevel__Microsoft=Information
+            - Logging__LogLevel__Microsoft.Hosting.Lifetime=Information
         networks:
             - proxy-tier
+        logging:
+            driver: "gelf"
+            options:
+                gelf-address: "udp://127.0.0.1:12201"
