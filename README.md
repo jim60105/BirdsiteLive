@@ -1,3 +1,19 @@
+# BirdsiteLIVE
+
+[![ASP.NET Core Build & Tests](https://github.com/jim60105/BirdsiteLive/actions/workflows/dotnet-core.yml/badge.svg?branch=master)](https://github.com/jim60105/BirdsiteLive/actions/workflows/dotnet-core.yml)
+[![docker_publish](https://github.com/jim60105/BirdsiteLive/actions/workflows/docker_publish.yml/badge.svg?branch=master)](https://github.com/jim60105/BirdsiteLive/actions/workflows/docker_publish.yml)
+
+This project is another *fork* of [the fork of BirdsiteLIVE from pasture](https://git.gamers.exposed/pasture/BirdsiteLIVE). Changes made in this fork by jim60105(me) are:
+
+* Merge the latest changes from pasture/BirdsiteLIVE into NicolasConstant/BirdsiteLive
+* Migration to .NET 7
+* Update nuget packages
+* Use Workstation GC for my docker usage <https://github.com/jim60105/BirdsiteLive/commit/ebd0c07ef1334538095625631e3ea7c12869f69e>
+
+This fork is also available as a Docker image as `jim60105/birdsitelive` and `ghcr.io/jim60105/birdsitelive`.
+
+The pasture/BirdsiteLIVE project's original README is as follows:
+
 This project is a *fork* of [the original BirdsiteLIVE from NicolasConstant](https://github.com/NicolasConstant/BirdsiteLive). This fork runs in production on [a large BirdsiteLIVE instance](https://twtr.plus). Changes made in this fork include:
 
 * Rework About page entirely - also disclose unlisted accounts and federation restrictions
@@ -43,5 +59,3 @@ This project is licensed under the AGPLv3 License - see [LICENSE](https://github
 ## Contact
 
 You can contact me via ActivityPub <a rel="me" href="https://fosstodon.org/@BirdsiteLIVE">here</a>.
-
-

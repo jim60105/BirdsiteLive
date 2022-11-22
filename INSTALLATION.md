@@ -13,10 +13,10 @@ Your instance will need [docker](https://docs.docker.com/engine/install/) and [d
 
 ## Setup
 
-Download the [docker-compose file](https://git.gamers.exposed/pasture/BirdsiteLIVE/raw/branch/master/docker-compose.yml): 
+Download the [docker-compose file](https://raw.githubusercontent.com/jim60105/BirdsiteLive/master/docker-compose.yml): 
 
 ```
-sudo curl -L https://git.gamers.exposed/pasture/BirdsiteLIVE/raw/branch/master/docker-compose.yml -o docker-compose.yml
+sudo curl -L https://raw.githubusercontent.com/jim60105/BirdsiteLive/master/docker-compose.yml -o docker-compose.yml
 ```
 
 Then edit file: 
@@ -168,7 +168,7 @@ networks:
 
 services:
     server:
-        image: pasture/birdsitelive:latest
+        image: jim60105/birdsitelive:latest
         [...]
 
     db:

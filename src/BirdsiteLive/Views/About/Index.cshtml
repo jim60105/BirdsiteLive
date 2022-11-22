@@ -9,7 +9,8 @@
     @if (Model.Settings.MaxFollowsPerUser > 0)
     {
         <div class="alert alert-warning">
-            In order to keep this service available to everyone, users are only permitted to follow <b>@Model.Settings.MaxFollowsPerUser</b> account(s). Any additional follows will be rejected.
+            In order to keep this service available to everyone, users are only permitted to follow
+            <b>@Model.Settings.MaxFollowsPerUser</b> account(s). Any additional follows will be rejected.
         </div>
     }
 
@@ -23,26 +24,32 @@
     <h4>About @Model.Settings.Name</h4>
 
     <p>
-        @Model.Settings.Name runs an instance of BirdsiteLIVE, an <a href="https://activitypub.rocks" target="_blank">ActivityPub</a>-compatible <a href="https://en.wikipedia.org/wiki/Fediverse" target="_blank">Fediverse</a> server that delivers Tweets from Twitter to users on the Fediverse.
+        @Model.Settings.Name runs an instance of BirdsiteLIVE, an <a href="https://activitypub.rocks"
+           target="_blank">ActivityPub</a>-compatible <a href="https://en.wikipedia.org/wiki/Fediverse"
+           target="_blank">Fediverse</a> server that delivers Tweets from Twitter to users on the Fediverse.
 
         <br /><br />
 
-        BirdsiteLIVE does not make any public posts; every post is scoped appropriately using the "followers-only" or "unlisted" ActivityPub audiences.
+        BirdsiteLIVE does not make any public posts; every post is scoped appropriately using the "followers-only" or
+        "unlisted" ActivityPub audiences.
     </p>
 
     <h4 id="followers-only">Unlisted accounts</h4>
 
     <p>
 
-        The goal of this instance is <i>not</i> to make the Fediverse "Twitter 2"; it is to make the Fediverse easier to join by allowing people to follow those who will never move. Therefore, by default, Twitter posts are not shown publicly. This instance's admin may allow certain accounts to post using the unlisted audience; this allows an account's posts to be "boosted" or "repeated."
+        The goal of this instance is <i>not</i> to make the Fediverse "Twitter 2"; it is to make the Fediverse easier to
+        join by allowing people to follow those who will never move. Therefore, by default, Twitter posts are not shown
+        publicly. This instance's admin may allow certain accounts to post using the unlisted audience; this allows an
+        account's posts to be "boosted" or "repeated."
 
         <br /><br />
 
         Accounts that post using the "unlisted" audience are as follows:
 
-        <ul>
+    <ul>
             @Html.Raw(Model.UnlistedUsers)
-        </ul>
+    </ul>
     </p>
 
     <h4 id="saturation">Instance saturation</h4>
@@ -52,25 +59,35 @@
 
         <br /><br />
 
-        This instance relies on a tool Twitter provides (the API) to fetch Tweets in a predictable and high-quality manner. However, due to limits imposed by Twitter, this instance can only fetch so many Tweets and users per hour.<br /><br />
+        This instance relies on a tool Twitter provides (the API) to fetch Tweets in a predictable and high-quality
+        manner. However, due to limits imposed by Twitter, this instance can only fetch so many Tweets and users per
+        hour.<br /><br />
 
-        As this instance's saturation level approaches and exceeds 100%, it will no longer update accounts every 15 minutes and reduce how often it fetches Tweets to stay under Twitter's limits. Essentially, the more saturated a node is, the less efficient it will be.<br /><br />
+        As this instance's saturation level approaches and exceeds 100%, it will no longer update accounts every 15
+        minutes and reduce how often it fetches Tweets to stay under Twitter's limits. Essentially, the more saturated a
+        node is, the less efficient it will be.<br /><br />
 
-        When possible, you should <a href="https://git.gamers.exposed/pasture/BirdsiteLIVE/src/branch/master/INSTALLATION.md" target="_blank">start your own BirdsiteLIVE instance</a>. If you cannot, please be courteous and follow a limited number of accounts to keep the service available for everyone.
+        When possible, you should <a href="https://github.com/jim60105/BirdsiteLive/blob/master/INSTALLATION.md"
+           target="_blank">start your own BirdsiteLIVE instance</a>. If you cannot, please be courteous and follow a
+        limited number of accounts to keep the service available for everyone.
     </p>
 
-    @if (Model.Settings.DiscloseInstanceRestrictions && (Model.ModerationStatus.Followers != BirdsiteLive.Domain.Repository.ModerationTypeEnum.None || Model.ModerationStatus.TwitterAccounts != BirdsiteLive.Domain.Repository.ModerationTypeEnum.None))
+    @if (Model.Settings.DiscloseInstanceRestrictions && (Model.ModerationStatus.Followers !=
+    BirdsiteLive.Domain.Repository.ModerationTypeEnum.None || Model.ModerationStatus.TwitterAccounts !=
+    BirdsiteLive.Domain.Repository.ModerationTypeEnum.None))
     {
         <h4 id="restrictions">
             Instance restrictions
         </h4>
 
-        <p>This instance can generally communicate with any other server following the ActivityPub protocol, with some exceptions, as listed below and configured by this server's administrators.</p>
+        <p>This instance can generally communicate with any other server following the ActivityPub protocol, with some
+            exceptions, as listed below and configured by this server's administrators.</p>
 
         if (Model.ModerationStatus.Followers == BirdsiteLive.Domain.Repository.ModerationTypeEnum.BlackListing)
         {
             <h5 id="instance-blacklist">Instance blacklist</h5>
-            <p>No data for instances on this list will be processed. Users from instances on this list are not able to follow or directly receive Tweets from accounts on this instance.</p>
+            <p>No data for instances on this list will be processed. Users from instances on this list are not able to follow or
+                directly receive Tweets from accounts on this instance.</p>
 
             <ul>
                 @foreach (var i in Model.ModerationStatus.Repository.GetBlacklistedFollowers())
@@ -83,7 +100,8 @@
         if (Model.ModerationStatus.Followers == BirdsiteLive.Domain.Repository.ModerationTypeEnum.WhiteListing)
         {
             <h5 id="instance-whitelist">Instance whitelist</h5>
-            <p>Only users from instances on this list will be able to follow or directly receive Tweets from accounts on this instance.</p>
+            <p>Only users from instances on this list will be able to follow or directly receive Tweets from accounts on this
+                instance.</p>
 
             <ul>
                 @foreach (var i in Model.ModerationStatus.Repository.GetWhitelistedFollowers())
@@ -96,7 +114,8 @@
         if (Model.ModerationStatus.TwitterAccounts == BirdsiteLive.Domain.Repository.ModerationTypeEnum.BlackListing)
         {
             <h5 id="account-blacklist">Account blacklist</h5>
-            <p>Users will not be able to follow the following Twitter accounts on this instance, and Tweets from these accounts will not be relayed.</p>
+            <p>Users will not be able to follow the following Twitter accounts on this instance, and Tweets from these accounts
+                will not be relayed.</p>
 
             <ul>
                 @foreach (var i in Model.ModerationStatus.Repository.GetBlacklistedAccounts())

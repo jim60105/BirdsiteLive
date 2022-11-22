@@ -73,7 +73,7 @@ networks:
 
 services:
     server:
-        image: pasture/birdsitelive:latest
+        image: jim60105/birdsitelive:latest
         [...]
         environment:
             - Instance:Domain=domain.name
