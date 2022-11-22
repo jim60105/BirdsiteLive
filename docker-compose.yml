@@ -1,4 +1,4 @@
-version: "3"
+version: "3.4"
 
 networks:
     birdsitelivenetwork:
@@ -10,15 +10,15 @@ services:
         restart: always
         container_name: birdsitelive
         environment:
-            - Instance:Domain=domain.name
-            - Instance:AdminEmail=name@domain.ext
-            - Db:Type=postgres
-            - Db:Host=db
-            - Db:Name=birdsitelive
-            - Db:User=birdsitelive
-            - Db:Password=birdsitelive
-            - Twitter:ConsumerKey=twitter.api.key
-            - Twitter:ConsumerSecret=twitter.api.key
+            - Instance__Domain=domain.name
+            - Instance__AdminEmail=name@domain.ext
+            - Db__Type=postgres
+            - Db__Host=db
+            - Db__Name=birdsitelive
+            - Db__User=birdsitelive
+            - Db__Password=birdsitelive
+            - Twitter__ConsumerKey=twitter.api.key
+            - Twitter__ConsumerSecret=twitter.api.key
         networks:
             - birdsitelivenetwork
         ports:
