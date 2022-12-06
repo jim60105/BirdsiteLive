@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using BirdsiteLive.Common.Settings;
 using BirdsiteLive.Twitter.Models;
+using Microsoft.Extensions.Logging;
 using Tweetinvi.Models;
 using Tweetinvi.Models.Entities;
 
@@ -17,16 +18,22 @@ namespace BirdsiteLive.Twitter.Extractors
     public class TweetExtractor : ITweetExtractor
     {
         private readonly InstanceSettings _instanceSettings;
+        private readonly ILogger<TweetExtractor> _logger;
 
         #region Ctor
-        public TweetExtractor(InstanceSettings instanceSettings)
+        public TweetExtractor(
+            InstanceSettings instanceSettings,
+            ILogger<TweetExtractor> logger)
         {
             this._instanceSettings = instanceSettings;
+            this._logger = logger;
         }
         #endregion
 
         public ExtractedTweet Extract(ITweet tweet)
         {
+            _logger.LogDebug("Extract tweet: {tweet}", tweet);
+
             var extractedTweet = new ExtractedTweet
             {
                 Id = tweet.Id,
@@ -36,11 +43,11 @@ namespace BirdsiteLive.Twitter.Extractors
                 Media = ExtractMedia(tweet),
                 CreatedAt = tweet.CreatedAt.ToUniversalTime(),
                 IsReply = tweet.InReplyToUserId != null,
-                IsThread = tweet.InReplyToUserId != null && tweet.InReplyToUserId == tweet.CreatedBy.Id,
+                IsThread = tweet.InReplyToUserId != null && tweet.InReplyToUserId == tweet.CreatedBy?.Id,
                 IsRetweet = tweet.IsRetweet || tweet.QuotedStatusId != null,
                 RetweetUrl = ExtractRetweetUrl(tweet),
                 IsSensitive = tweet.PossiblySensitive,
-                QuoteTweetUrl = tweet.QuotedStatusId != null ? "https://" + _instanceSettings.Domain + "/users/" + tweet.QuotedTweet.CreatedBy.ScreenName + "/statuses/" + tweet.QuotedStatusId : null
+                QuoteTweetUrl = tweet.QuotedStatusId != null ? "https://" + _instanceSettings.Domain + "/users/" + tweet.QuotedTweet?.CreatedBy?.ScreenName + "/statuses/" + tweet.QuotedStatusId : null
             };
 
             return extractedTweet;

@@ -87,7 +87,7 @@ namespace BirdsiteLive.Twitter
                 if (timeline != null) tweets.AddRange(timeline);
             }
 
-            return tweets.Select(_tweetExtractor.Extract).ToArray();
+            return tweets.Where(p => null != p).Select(_tweetExtractor.Extract).ToArray();
         }
     }
 }
