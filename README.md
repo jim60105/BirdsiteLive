@@ -9,10 +9,12 @@ This project is another *fork* of [the fork of BirdsiteLIVE from pasture](https:
 * Migration to .NET 7
 * Update nuget packages
 * Use Workstation GC for my docker usage <https://github.com/jim60105/BirdsiteLive/commit/ebd0c07ef1334538095625631e3ea7c12869f69e>
+* Use the dropdown list to display whitelisted accounts.
+* Minor bug fixes
 
 This fork is also available as a Docker image as `jim60105/birdsitelive` and `ghcr.io/jim60105/birdsitelive`.
 
-The pasture/BirdsiteLIVE project's original README is as follows:
+## The pasture/BirdsiteLIVE project's original README is as follows
 
 This project is a *fork* of [the original BirdsiteLIVE from NicolasConstant](https://github.com/NicolasConstant/BirdsiteLive). This fork runs in production on [a large BirdsiteLIVE instance](https://twtr.plus). Changes made in this fork include:
 
