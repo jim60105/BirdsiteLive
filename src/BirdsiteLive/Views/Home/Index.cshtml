@@ -1,6 +1,9 @@
 @using BirdsiteLive.Common.Settings;
-@model InstanceSettings
-@{ ViewData["Title"] = "Home Page"; }
+@model (InstanceSettings, string[])
+@{
+    ViewData["Title"] = "Home Page";
+    var (instanceSettings, WhitelistedAccounts) = Model;
+}
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
@@ -12,24 +15,40 @@
 
     <form method="POST">
         <div class="form-group">
-            <input type="text" class="form-control col-8 col-sm-8 col-md-6 col-lg-4 mx-auto" id="handle" name="handle" autocomplete="off" placeholder="Twitter Handle">
+            @if(WhitelistedAccounts.Length != 0)
+            {
+                <div class="alert alert-warning">
+                    This instance is in whitelist mode. Only the following accounts are allowed.
+                </div>
+
+                <select class="form-select col-8 col-sm-8 col-md-6 col-lg-4 mx-auto" id="handle" name="handle" autocomplete="off" >
+                    @foreach (var account in WhitelistedAccounts)
+                    {
+                        <option value="@account">@account</option>
+                    }
+                </select>
+            }
+            else
+            {
+                <input type="text" class="form-control col-8 col-sm-8 col-md-6 col-lg-4 mx-auto" id="handle" name="handle" autocomplete="off" placeholder="Twitter Handle">
+            }
         </div>
         <button type="submit" class="btn btn-primary">Show</button>
     </form>
 
     <br /><br />
 
-    @if( Model.MaxFollowsPerUser > 0)
+    @if( instanceSettings.MaxFollowsPerUser > 0)
     {
         <div class="alert alert-warning">
-            In order to keep this service available to everyone, users are only permitted to follow <b>@Model.MaxFollowsPerUser</b> account(s). Any additional follows will be rejected. For more information, see our <a href="/About#saturation">about page</a>.
+            In order to keep this service available to everyone, users are only permitted to follow <b>@instanceSettings.MaxFollowsPerUser</b> account(s). Any additional follows will be rejected. For more information, see our <a href="/About#saturation">about page</a>.
         </div>
     }
 
-    @if (Model.InfoBanner.Length > 0)
+    @if (instanceSettings.InfoBanner.Length > 0)
     {
     <div class="alert alert-danger">
-        @Html.Raw(Model.InfoBanner)
+        @Html.Raw(instanceSettings.InfoBanner)
     </div>
     }
 

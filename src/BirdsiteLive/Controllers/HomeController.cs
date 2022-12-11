@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using BirdsiteLive.Models;
 using BirdsiteLive.Common.Settings;
+using BirdsiteLive.Domain.Repository;
 
 namespace BirdsiteLive.Controllers
 {
@@ -14,16 +15,22 @@ namespace BirdsiteLive.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly InstanceSettings _instanceSettings;
+        private readonly ModerationRepository _moderationRepository;
 
-        public HomeController(ILogger<HomeController> logger, InstanceSettings instanceSettings)
+        public HomeController(
+            ILogger<HomeController> logger,
+            InstanceSettings instanceSettings,
+            ModerationRepository moderationRepository
+            )
         {
             _logger = logger;
             _instanceSettings = instanceSettings;
+            _moderationRepository = moderationRepository;
         }
 
         public IActionResult Index()
         {
-            return View(_instanceSettings);
+            return View((_instanceSettings, _moderationRepository.GetWhitelistedAccounts().ToArray()));
         }
 
         public IActionResult Privacy()
