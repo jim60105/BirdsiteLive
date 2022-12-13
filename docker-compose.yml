@@ -19,6 +19,8 @@ services:
             - Db__Password=birdsitelive
             - Twitter__ConsumerKey=twitter.api.key
             - Twitter__ConsumerSecret=twitter.api.key
+            ## Enable this if you encounter issues and need to check the debug logs on page
+            # - ASPNETCORE_ENVIRONMENT=Development
         networks:
             - birdsitelivenetwork
         ports:
