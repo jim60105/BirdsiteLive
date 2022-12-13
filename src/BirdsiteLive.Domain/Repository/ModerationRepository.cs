@@ -145,22 +145,22 @@ namespace BirdsiteLive.Domain.Repository
 
         public IEnumerable<string> GetWhitelistedFollowers()
         {
-            return _settings.FollowersWhiteListing.Split(GetSplitChar(_settings.FollowersWhiteListing));
+            return _settings.FollowersWhiteListing.Split(GetSplitChar(_settings.FollowersWhiteListing), StringSplitOptions.RemoveEmptyEntries);
         }
 
         public IEnumerable<string> GetBlacklistedFollowers()
         {
-            return _settings.FollowersBlackListing.Split(GetSplitChar(_settings.FollowersBlackListing));
+            return _settings.FollowersBlackListing.Split(GetSplitChar(_settings.FollowersBlackListing), StringSplitOptions.RemoveEmptyEntries);
         }
 
         public IEnumerable<string> GetWhitelistedAccounts()
         {
-            return _settings.TwitterAccountsWhiteListing.Split(GetSplitChar(_settings.TwitterAccountsWhiteListing));
+            return _settings.TwitterAccountsWhiteListing.Split(GetSplitChar(_settings.TwitterAccountsWhiteListing), StringSplitOptions.RemoveEmptyEntries);
         }
 
         public IEnumerable<string> GetBlacklistedAccounts()
         {
-            return _settings.TwitterAccountsBlackListing.Split(GetSplitChar(_settings.TwitterAccountsBlackListing));
+            return _settings.TwitterAccountsBlackListing.Split(GetSplitChar(_settings.TwitterAccountsBlackListing), StringSplitOptions.RemoveEmptyEntries);
         }
     }
 
