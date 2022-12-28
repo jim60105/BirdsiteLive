@@ -47,7 +47,8 @@ namespace BirdsiteLive.Twitter.Extractors
                 IsRetweet = tweet.IsRetweet || tweet.QuotedStatusId != null,
                 RetweetUrl = ExtractRetweetUrl(tweet),
                 IsSensitive = tweet.PossiblySensitive,
-                QuoteTweetUrl = tweet.QuotedStatusId != null ? "https://" + _instanceSettings.Domain + "/users/" + tweet.QuotedTweet?.CreatedBy?.ScreenName + "/statuses/" + tweet.QuotedStatusId : null
+                QuoteTweetUrl = tweet.QuotedStatusId != null ? "https://" + _instanceSettings.Domain + "/users/" + tweet.QuotedTweet?.CreatedBy?.ScreenName + "/statuses/" + tweet.QuotedStatusId : null,
+                CreatorName = tweet.CreatedBy.UserIdentifier.ScreenName
             };
 
             return extractedTweet;
