@@ -25,12 +25,6 @@ namespace BirdsiteLive.Domain
         Task<WebFingerData> WebFinger(string webfinger);
     }
 
-    public class WebFinger
-    {
-        public string subject { get; set; }
-        public string[] aliases { get; set; }
-    }
-
     public class ActivityPubService : IActivityPubService
     {
         private readonly InstanceSettings _instanceSettings;
@@ -50,19 +44,7 @@ namespace BirdsiteLive.Domain
 
         public async Task<string> GetUserIdAsync(string acct)
         {
-            var splittedAcct = acct.Trim('@').Split('@');
-
-            var url = $"https://{splittedAcct[1]}/.well-known/webfinger?resource=acct:{splittedAcct[0]}@{splittedAcct[1]}";
-
-            var httpClient = _httpClientFactory.CreateClient();
-            httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
-            var result = await httpClient.GetAsync(url);
-
-            result.EnsureSuccessStatusCode();
-
-            var content = await result.Content.ReadAsStringAsync();
-
-            var actor = JsonConvert.DeserializeObject<WebFinger>(content);
+            var actor = await WebFinger(acct);
             return actor.aliases.FirstOrDefault();
         }
 
@@ -178,8 +160,16 @@ namespace BirdsiteLive.Domain
 
         public async Task<WebFingerData> WebFinger(string account)
         {
+            var splittedAcct = account.Trim('@').Split('@');
+
+            var url = $"https://{splittedAcct[1]}/.well-known/webfinger?resource=acct:{splittedAcct[0]}@{splittedAcct[1]}";
+
             var httpClient = _httpClientFactory.CreateClient();
-            var result = await httpClient.GetAsync("https://" + account.Split('@')[1] + "/.well-known/webfinger?resource=acct:" + account);
+            httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+            var result = await httpClient.GetAsync(url);
+
+            result.EnsureSuccessStatusCode();
+
             var content = await result.Content.ReadAsStringAsync();
 
             return JsonConvert.DeserializeObject<WebFingerData>(content);

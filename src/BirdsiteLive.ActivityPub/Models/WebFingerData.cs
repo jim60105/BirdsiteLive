@@ -9,6 +9,8 @@ namespace BirdsiteLive.ActivityPub.Models
         public List<string> aliases { get; set; }
 
         public List<WebFingerLink> links { get; set; }
+
+        public string subject { get; set; }
     }
 
     public class WebFingerLink
