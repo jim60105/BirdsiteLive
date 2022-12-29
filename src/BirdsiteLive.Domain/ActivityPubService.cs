@@ -16,11 +16,13 @@ namespace BirdsiteLive.Domain
 {
     public interface IActivityPubService
     {
+        Task<string> GetUserIdAsync(string acct);
         Task<Actor> GetUser(string objectId);
         Task<HttpStatusCode> PostDataAsync<T>(T data, string targetHost, string actorUrl, string inbox = null);
         Task PostNewNoteActivity(Note note, string username, string noteId, string targetHost,
             string targetInbox);
-        Task<WebFingerData> WebFinger(string account);
+        Task DeleteUserAsync(string username, string targetHost, string targetInbox);
+        Task<WebFingerData> WebFinger(string webfinger);
     }
 
     public class ActivityPubService : IActivityPubService
@@ -40,6 +42,12 @@ namespace BirdsiteLive.Domain
         }
         #endregion
 
+        public async Task<string> GetUserIdAsync(string acct)
+        {
+            var actor = await WebFinger(acct);
+            return actor.aliases.FirstOrDefault();
+        }
+
         public async Task<Actor> GetUser(string objectId)
         {
             var httpClient = _httpClientFactory.CreateClient();
@@ -56,6 +64,31 @@ namespace BirdsiteLive.Domain
             var actor = JsonConvert.DeserializeObject<Actor>(content);
             if (string.IsNullOrWhiteSpace(actor.url)) actor.url = objectId;
             return actor;
+        }
+
+        public async Task DeleteUserAsync(string username, string targetHost, string targetInbox)
+        {
+            try
+            {
+                var actor = UrlFactory.GetActorUrl(_instanceSettings.Domain, username);
+
+                var deleteUser = new ActivityDelete
+                {
+                    context = "https://www.w3.org/ns/activitystreams",
+                    id = $"{actor}#delete",
+                    type = "Delete",
+                    actor = actor,
+                    to = new [] { "https://www.w3.org/ns/activitystreams#Public" },
+                    apObject = actor
+                };
+
+                await PostDataAsync(deleteUser, targetHost, actor, targetInbox);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error deleting {Username} to {Host}{Inbox}", username, targetHost, targetInbox);
+                throw;
+            }
         }
 
         public async Task PostNewNoteActivity(Note note, string username, string noteId, string targetHost, string targetInbox)
@@ -127,8 +160,16 @@ namespace BirdsiteLive.Domain
 
         public async Task<WebFingerData> WebFinger(string account)
         {
+            var splittedAcct = account.Trim('@').Split('@');
+
+            var url = $"https://{splittedAcct[1]}/.well-known/webfinger?resource=acct:{splittedAcct[0]}@{splittedAcct[1]}";
+
             var httpClient = _httpClientFactory.CreateClient();
-            var result = await httpClient.GetAsync("https://" + account.Split('@')[1] + "/.well-known/webfinger?resource=acct:" + account);
+            httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+            var result = await httpClient.GetAsync(url);
+
+            result.EnsureSuccessStatusCode();
+
             var content = await result.Content.ReadAsStringAsync();
 
             return JsonConvert.DeserializeObject<WebFingerData>(content);
