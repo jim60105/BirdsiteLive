@@ -16,7 +16,7 @@ services:
             - Instance__Name=BirdsiteLIVE.maki0419
             - Instance__Domain=twitterbridge.mastodon.maki0419.com
             - Instance__AdminEmail=jim60105@gmail.com
-            - Instance__InfoBanner=This is a personal instance of BirdsiteLIVE.<br>You cannot add users.<br>Check <a href="/About">the about page</a> to run your own instance.
+            # - Instance__InfoBanner=This is a personal instance of BirdsiteLIVE.<br>You cannot add users.<br>Check <a href="/About">the about page</a> to run your own instance.
             - Instance__TwitterDomain=nitter.net
             - Instance__TwitterDomainLabel=Nitter
             - Instance__MaxStatusFetchAge=3
