@@ -84,15 +84,17 @@ namespace BirdsiteLive.Domain
                 _statisticsHandler.ExtractedDescription(extracted.tags.Count(x => x.type == "Mention"));
             }
 
-            var attachments = new List<UserAttachment>();
-            attachments.Add(new UserAttachment
+            var attachments = new List<UserAttachment>
             {
-                type = "PropertyValue",
-                name = _instanceSettings.TwitterDomainLabel != "" ? _instanceSettings.TwitterDomainLabel : _instanceSettings.TwitterDomain,
-                value = $"<a href=\"https://{_instanceSettings.TwitterDomain}/{acct}\" rel=\"me nofollow noopener noreferrer\" target=\"_blank\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">{_instanceSettings.TwitterDomain}/{acct}</span></a>"
-            });
+                new UserAttachment
+                {
+                    type = "PropertyValue",
+                    name = _instanceSettings.TwitterDomainLabel != "" ? _instanceSettings.TwitterDomainLabel : _instanceSettings.TwitterDomain,
+                    value = $"<a href=\"https://{_instanceSettings.TwitterDomain}/{acct}\" rel=\"me nofollow noopener noreferrer\" target=\"_blank\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">{_instanceSettings.TwitterDomain}/{acct}</span></a>"
+                }
+            };
 
-            if(_instanceSettings.TwitterDomain != "twitter.com")
+            if (_instanceSettings.TwitterDomain != "twitter.com")
             {
                 attachments.Add(new UserAttachment
                 {
@@ -111,6 +113,13 @@ namespace BirdsiteLive.Domain
                     value = $"<a href=\"https://{_instanceSettings.Domain}/About\" rel=\"nofollow noopener noreferrer\" target=\"_blank\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">{_instanceSettings.Domain}/About</span></a>"
                 });
             }
+
+            attachments.Add(new UserAttachment
+            {
+                type = "PropertyValue",
+                name = "Take control of this account",
+                value = $"<a href=\"https://{_instanceSettings.Domain}/migration/move/{acct}\" rel=\"me nofollow noopener noreferrer\" target=\"_blank\">MANAGE</a>"
+            });
 
             var user = new Actor
             {
